@@ -1,6 +1,6 @@
 /*
  * File:   Main.c
- * Author: Tristen
+ * Author: Tristen Miller
  *
  * Created on February 27, 2024, 11:49 AM
  */
@@ -20,16 +20,33 @@ typedef struct {
 
 // Function to get the value at a specific row and column in the matrix
 
+/**
+ * Function to get the value at a specific row and column in the matrix.
+ * @param matrix Pointer to the Matrix3x3 struct.
+ * @param row Row index (0-based) of the element.
+ * @param col Column index (0-based) of the element.
+ * @return The value at the specified row and column.
+ */
 float getEntry(const Matrix3x3 *matrix, int row, int col)
 {
     return matrix->data[row][col];
 }
 
+/**
+ * Function to convert radians to degrees.
+ * @param rads Value in radians.
+ * @return Equivalent value in degrees.
+ */
 float convertRadToDeg(float rads)
 {
     return rads * (180 / PI);
 }
 
+/**
+ * Function to calculate the theta angle in radians.
+ * @param matrix Pointer to the Matrix3x3 struct.
+ * @return Theta angle in radians.
+ */
 float getTheta(Matrix3x3 *matrix)
 {
     float raw = getEntry(matrix, 0, 2);
@@ -37,24 +54,32 @@ float getTheta(Matrix3x3 *matrix)
     return rads;
 }
 
+/**
+ * Function to calculate the psi angle in radians.
+ * @param matrix Pointer to the Matrix3x3 struct.
+ * @return Psi angle in radians.
+ */
 float getPsi(Matrix3x3 *matrix)
 {
     float theta = getTheta(matrix);
     float raw = getEntry(matrix, 0, 1);
-    printf("Raw psi = %f\n", raw);
     raw /= cos(theta);
-    printf("Psi after division by cos(theta): %f\n", raw);
     float rads = asin(raw);
-    return (rads);
+    return rads;
 }
 
+/**
+ * Function to calculate the phi angle in radians.
+ * @param matrix Pointer to the Matrix3x3 struct.
+ * @return Phi angle in radians.
+ */
 float getPhi(Matrix3x3 *matrix)
 {
     float theta = getTheta(matrix);
     float raw = getEntry(matrix, 1, 2);
     raw /= cos(theta);
     float rads = asin(raw);
-    return (rads);
+    return rads;
 }
 
 int main(void)
