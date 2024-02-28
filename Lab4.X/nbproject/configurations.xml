@@ -9,10 +9,10 @@
       <itemPath>I2C.h</itemPath>
       <itemPath>serial.h</itemPath>
       <itemPath>Matrix.h</itemPath>
-      <itemPath>../Common/Ascii.h</itemPath>
-      <itemPath>../Common/Oled.h</itemPath>
-      <itemPath>../Common/OledDriver.h</itemPath>
-      <itemPath>DCM.h</itemPath>
+      <itemPath>Ascii.h</itemPath>
+      <itemPath>Oled.h</itemPath>
+      <itemPath>OledDriver.h</itemPath>
+      <itemPath>RK.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -40,7 +40,6 @@
   <sourceRootList>
     <Elem>../../trkmille/Common</Elem>
     <Elem>.</Elem>
-    <Elem>../Common</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -94,7 +93,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="..\Common;..\..\trkmille\Common"/>
+                  value="..\Common;..\..\trkmille\Common;."/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>

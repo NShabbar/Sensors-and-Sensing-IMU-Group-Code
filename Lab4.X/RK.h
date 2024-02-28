@@ -9,6 +9,7 @@
 #define	RK_H
 
 #define EPSILON 0.0001 // Threshold for switching to sin function from Taylor Expansion
+#include "Matrix.h"
 
 typedef struct {
     float data[3];

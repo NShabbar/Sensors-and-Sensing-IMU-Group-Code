@@ -58,6 +58,8 @@ Matrix3x3 dotProduct(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
  */
 Matrix3x3 subtraction(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
 
+void printMatrix(const Matrix3x3 *matrix);
+
 
 
 #endif	/* MATRIX_H */
