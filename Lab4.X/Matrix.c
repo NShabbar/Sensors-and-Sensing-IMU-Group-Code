@@ -25,18 +25,23 @@ typedef struct {
     float data[3][3];
 } Matrix3x3;
 
-// Function to compute the Taylor series approximation for sin(x?T)/x
+// Function to compute the Taylor series approximation for sin(w deltaT)/w
 
-float sinx_over_x(float w, float time)
-{
+float sinw_over_w(float w, float time) {
     if (fabs(w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
         // Taylor series approximation
-        return 1.0 - (pow((w * time), 2) / 6.0) + (pow((w * time), 4) / 120.0);
+        return time - ((pow(time, 3) * pow((w), 2)) / 6.0) + (((pow(time, 5) * pow((w), 4)) / 120.0));
     } else {
         // Switch to sin function
         return sin(w * time) / w;
     }
 }
+
+// function to compute 1 - cos(w delta T))
+float cosw(float w, float time) {
+    return 1 - cos(w * time);
+}
+
 
 // Function to get the value at a specific row and column in the matrix
 
@@ -47,8 +52,7 @@ float sinx_over_x(float w, float time)
  * @param col Column index (0-based) of the element.
  * @return The value at the specified row and column.
  */
-float getEntry(const Matrix3x3 *matrix, int row, int col)
-{
+float getEntry(const Matrix3x3 *matrix, int row, int col) {
     return matrix->data[row][col];
 }
 
@@ -67,8 +71,7 @@ float convertRadToDeg(float rads)
  * @param matrix Pointer to the Matrix3x3 struct.
  * @return Theta angle in radians.
  */
-float getTheta(Matrix3x3 *matrix)
-{
+float getTheta(Matrix3x3 *matrix) {
     float raw = getEntry(matrix, 0, 2);
     float rads = -asin(raw);
     return rads;
@@ -79,8 +82,7 @@ float getTheta(Matrix3x3 *matrix)
  * @param matrix Pointer to the Matrix3x3 struct.
  * @return Psi angle in radians.
  */
-float getPsi(Matrix3x3 *matrix)
-{
+float getPsi(Matrix3x3 *matrix) {
     float theta = getTheta(matrix);
     float raw = getEntry(matrix, 0, 1);
     raw /= cos(theta);
@@ -93,8 +95,7 @@ float getPsi(Matrix3x3 *matrix)
  * @param matrix Pointer to the Matrix3x3 struct.
  * @return Phi angle in radians.
  */
-float getPhi(Matrix3x3 *matrix)
-{
+float getPhi(Matrix3x3 *matrix) {
     float theta = getTheta(matrix);
     float raw = getEntry(matrix, 1, 2);
     raw /= cos(theta);
@@ -102,8 +103,8 @@ float getPhi(Matrix3x3 *matrix)
     return rads;
 }
 
-int main(void)
-{
+int main(void) {
+#ifdef Matrix_Test
     BOARD_Init();
     OledInit();
     char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
@@ -144,9 +145,19 @@ int main(void)
 
 #ifdef Sin_Taylor_Test
     // Example usage
-    float omega_delta_t = 0.01; // Example value of ??t
-    float result = sinx_over_x(omega_delta_t);
-    printf("Result: %f\n", result);
+    float t = 1; // test time
+    float omega_sin = 0.01; // test w
+    float result = sinw_over_w(omega_sin, t);
+    
+    float omega_sin_small = 0.000001; // test w
+    float res_small = sinw_over_w(omega_sin_small);
+    
+    float omega_cos = 0.01;
+    float res_cos = cosw(omega_cos, t);
+    
+    float omega_cos_small = 0.000001;
+    float res_cos_small = cosw(omega_cos_small, t);
+    printf("Result: %f, %f, %f, %f\n", result, res_small, res_cos, res_cos_small);
 #endif
     return 0;
 }
