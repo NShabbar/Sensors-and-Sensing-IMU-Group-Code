@@ -99,7 +99,7 @@ void printMatrix(const Matrix3x3 *matrix) {
         printf("\n");
     }
 }
-#define MATRIX_TEST
+//#define MATRIX_TEST
 
 #ifdef MATRIX_TEST
 #include <assert.h>
