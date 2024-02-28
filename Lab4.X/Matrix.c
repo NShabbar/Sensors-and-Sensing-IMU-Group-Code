@@ -13,8 +13,8 @@
 #include "Oled.h"
 
 // defines for code testing
-#define Matrix_Test
-//#define Sin_Taylor_Test
+//#define Matrix_Test
+#define Sin_Taylor_Test
 
 #define PI (acos(-1.0))
 #define EPSILON 0.0001 // Threshold for switching to sin function from Taylor Expansion
@@ -104,7 +104,6 @@ float getPhi(Matrix3x3 *matrix) {
 }
 
 int main(void) {
-#ifdef Matrix_Test
     BOARD_Init();
     OledInit();
     char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
@@ -150,7 +149,7 @@ int main(void) {
     float result = sinw_over_w(omega_sin, t);
     
     float omega_sin_small = 0.000001; // test w
-    float res_small = sinw_over_w(omega_sin_small);
+    float res_small = sinw_over_w(omega_sin_small, t);
     
     float omega_cos = 0.01;
     float res_cos = cosw(omega_cos, t);

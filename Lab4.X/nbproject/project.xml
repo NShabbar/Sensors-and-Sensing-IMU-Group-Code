@@ -15,7 +15,6 @@
             <sourceRootList>
                 <sourceRootElem>../../trkmille/Common</sourceRootElem>
                 <sourceRootElem>.</sourceRootElem>
-                <sourceRootElem>../Common</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>
