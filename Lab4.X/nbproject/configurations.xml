@@ -9,9 +9,10 @@
       <itemPath>I2C.h</itemPath>
       <itemPath>serial.h</itemPath>
       <itemPath>Matrix.h</itemPath>
-      <itemPath>Ascii.h</itemPath>
-      <itemPath>Oled.h</itemPath>
-      <itemPath>OledDriver.h</itemPath>
+      <itemPath>../Common/Ascii.h</itemPath>
+      <itemPath>../Common/Oled.h</itemPath>
+      <itemPath>../Common/OledDriver.h</itemPath>
+      <itemPath>DCM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -25,9 +26,10 @@
       <itemPath>I2C.c</itemPath>
       <itemPath>serial.c</itemPath>
       <itemPath>Matrix.c</itemPath>
-      <itemPath>Ascii.c</itemPath>
-      <itemPath>Oled.c</itemPath>
-      <itemPath>OledDriver.c</itemPath>
+      <itemPath>../Common/Ascii.c</itemPath>
+      <itemPath>../Common/Oled.c</itemPath>
+      <itemPath>../Common/OledDriver.c</itemPath>
+      <itemPath>DCM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -38,6 +40,7 @@
   <sourceRootList>
     <Elem>../../trkmille/Common</Elem>
     <Elem>.</Elem>
+    <Elem>../Common</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -47,7 +50,7 @@
         <targetDevice>PIC32MX340F512H</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>Simulator</platformTool>
+        <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>4.00</languageToolchainVersion>
         <platform>3</platform>

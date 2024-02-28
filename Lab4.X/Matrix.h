@@ -14,6 +14,10 @@
 #include "BNO055.h"
 #include <math.h>
 
+typedef struct {
+    float data[3][3];
+} Matrix3x3;
+
 // Function to get the value at a specific row and column in the matrix
 
 /**
@@ -25,33 +29,16 @@
  */
 float getEntry(const Matrix3x3 *matrix, int row, int col);
 
-/**
- * Function to convert radians to degrees.
- * @param rads Value in radians.
- * @return Equivalent value in degrees.
- */
-float convertRadToDeg(float rads);
 
-/**
- * Function to calculate the theta angle in radians.
- * @param matrix Pointer to the Matrix3x3 struct.
- * @return Theta angle in radians.
- */
-float getTheta(Matrix3x3 *matrix);
+void setEntry(const Matrix3x3 *matrix, int row, int col);
 
-/**
- * Function to calculate the psi angle in radians.
- * @param matrix Pointer to the Matrix3x3 struct.
- * @return Psi angle in radians.
- */
-float getPsi(Matrix3x3 *matrix);
+void scalarMult(const Matrix3x3 *matrix, float scalar);
 
-/**
- * Function to calculate the phi angle in radians.
- * @param matrix Pointer to the Matrix3x3 struct.
- * @return Phi angle in radians.
- */
-float getPhi(Matrix3x3 *matrix);
+Matrix3x3 dotProduct(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
+
+Matrix3x3 subtraction(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
+
+
 
 #endif	/* MATRIX_H */
 

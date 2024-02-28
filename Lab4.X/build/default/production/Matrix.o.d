@@ -1,15 +1,7 @@
-build/default/production/Matrix.o: Matrix.c BOARD.h BNO055.h \
- ../Common/Oled.h ../Common/Ascii.h ../Common/OledDriver.h \
- ../Common/BOARD.h
+build/default/production/Matrix.o: Matrix.c Matrix.h BOARD.h BNO055.h
+
+Matrix.h:
 
 BOARD.h:
 
 BNO055.h:
-
-../Common/Oled.h:
-
-../Common/Ascii.h:
-
-../Common/OledDriver.h:
-
-../Common/BOARD.h:
