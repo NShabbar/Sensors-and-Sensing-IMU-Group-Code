@@ -9,6 +9,9 @@
       <itemPath>I2C.h</itemPath>
       <itemPath>serial.h</itemPath>
       <itemPath>Matrix.h</itemPath>
+      <itemPath>../Common/Ascii.h</itemPath>
+      <itemPath>../Common/Oled.h</itemPath>
+      <itemPath>../Common/OledDriver.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -22,6 +25,9 @@
       <itemPath>I2C.c</itemPath>
       <itemPath>serial.c</itemPath>
       <itemPath>Matrix.c</itemPath>
+      <itemPath>../Common/Ascii.c</itemPath>
+      <itemPath>../Common/Oled.c</itemPath>
+      <itemPath>../Common/OledDriver.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -32,6 +38,7 @@
   <sourceRootList>
     <Elem>../../trkmille/Common</Elem>
     <Elem>.</Elem>
+    <Elem>../Common</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
