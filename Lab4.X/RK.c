@@ -20,7 +20,8 @@
 #define RK_test
 //#define sin_cos_test
 //#define mag_test
-#define Forward_Prop_test
+//#define Forward_Exp_test
+//#define Drift_test
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
 
 float sinw_over_w(float mag_w, float time) {
@@ -38,9 +39,9 @@ float sinw_over_w(float mag_w, float time) {
 float cosw_over_w_squared(float mag_w, float time) {
     if (fabs(mag_w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
         // Taylor series approximation
-        return (pow(time, 2)/2) - ((pow(time, 4) * pow(mag_w, 2)) / 24.0);
+        return (pow(time, 2) / 2) - ((pow(time, 4) * pow(mag_w, 2)) / 24.0);
     } else {
-    return 1 - (cos(mag_w * time)/(pow(mag_w, 2)));
+        return (1 - (cos(mag_w * time))) / (pow(mag_w, 2));
     }
 }
 
@@ -72,33 +73,37 @@ Matrix3x3 wx(Matrix1x3 w) {
 }
 
 // this function performs forward integration of Rk+1 = Rk - [wx]Rk * dt
-Matrix3x3 RK_Forward_Integration(Matrix3x3 RK, Matrix1x3 w, float dt){
+
+Matrix3x3 RK_Forward_Integration(Matrix3x3 RK, Matrix1x3 w, float dt) {
     Matrix3x3 cross = wx(w); // returns a 3x3 wx
     Matrix3x3 RK_Wcross = dotProduct(&cross, &RK); //[wx]Rk
     scalarMult(&RK_Wcross, dt); // [wx]Rk * dt
-    Matrix3x3 RK_1 = subtraction(&RK,  &RK_Wcross);
+    Matrix3x3 RK_1 = subtraction(&RK, &RK_Wcross);
     return RK_1;
 }
 
 // this function performs the matrix exponential form Rk+1 = e^(-[wx]dt) *Rk
-Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt){
+
+Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt) {
     Matrix3x3 I = {
-        {{1.0, 0.0, 0.0},
-         {0.0, 1.0, 0.0},
-         {0.0, 0.0, 1.0}}
+        {
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}
+        }
     };
     float mag = w_mag(w); // gets magnitude
     float cos_val = cosw_over_w_squared(mag, dt);
     Matrix3x3 cross = wx(w); // returns a 3x3 wx
     Matrix3x3 wx_wx = dotProduct(&cross, &cross); // squares wx matrix
     scalarMult(&wx_wx, cos_val); // multiplies and updates the wx_wx by scalar val
-    
+
     float sin_val = sinw_over_w(mag, dt);
     scalarMult(&cross, sin_val);
-    
+
     Matrix3x3 exponent_p1 = subtraction(&I, &cross); // first part of exponent calc.
     Matrix3x3 exponent = subtraction(&exponent_p1, &wx_wx); // full exponent calc
-    
+
     Matrix3x3 RK_1 = dotProduct(&exponent, &RK); // the final output
     return RK_1;
 }
@@ -109,7 +114,7 @@ int main(int argc, char** argv) {
     // Example usage
     BOARD_Init();
     OledInit();
-    char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
+    //char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
 #ifdef sin_cos_test
     float t = 1; // test time
     float omega_sin = 0.01; // test w
@@ -137,24 +142,73 @@ int main(int argc, char** argv) {
     OledDrawString(msg);
     OledUpdate();
 #endif
-    
-#ifdef Forward_Prop_test
+
+#ifdef Forward_Exp_test
     Matrix3x3 I = {
-        {{1.0, 0.0, 0.0},
-         {0.0, 1.0, 0.0},
-         {0.0, 0.0, 1.0}}
+        {
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}
+        }
     };
-    
+
     Matrix1x3 w_test = {
         {1.0, 2.0, 3.0}
     };
-    
+
     Matrix3x3 result = RK_Forward_Integration(I, w_test, 2);
     Matrix3x3 result2 = RK_Exp_Integration(I, w_test, 2);
     printf("Forward Integration: \n");
     printMatrix(&result);
     printf("Exponential Integration: \n");
     printMatrix(&result2);
+#endif
+
+#ifdef Drift_test
+    FILE *file_pointer;
+    //char buffer[100]; // Buffer to store read data
+    float r, p, q; // Variables to store data read from file
+
+    // Open the file in read mode
+    file_pointer = fopen("wGyro.txt", "r");
+
+    // Check if the file was opened successfully
+    if (file_pointer == NULL) {
+        printf("Error opening the file.\n");
+        return 1;
+    }
+    Matrix3x3 Rkarrayforward[7000];
+    Matrix3x3 Rkarrayexp[7000];
+    Matrix3x3 I={
+        {
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}
+        }
+    };
+    Rkarrayforward[0] = I;
+    Rkarrayexp[0] = I;
+    // Read data from the file line by line
+    int ind=0;
+    while (fscanf(file_pointer, "%f, %f, %f", &p, &q, &r) == 3) {
+        
+        Matrix1x3 w = {
+            {p, q, r}
+        };
+
+
+
+        Rkarrayforward[ind+1] = RK_Forward_Integration(Rkarrayforward[ind], w, 0.01);
+        Rkarrayexp[ind+1] = RK_Exp_Integration(Rkarrayexp[ind], w, 0.01);
+        ind++;
+
+    }
+    printMatrix(&Rkarrayforward[6631]);
+    
+    printMatrix(&Rkarrayexp[6631]);
+    
+    // Close the file
+    fclose(file_pointer);
 #endif
     return (EXIT_SUCCESS);
 }
