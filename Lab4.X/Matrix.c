@@ -23,7 +23,7 @@ typedef struct {
     float data[3][3];
 } Matrix3x3;
 
-// Function to compute the Taylor series approximation for sin(x?T)/x
+// Function to compute the Taylor series approximation for sin(w deltaT)/w
 
 float sinw_over_w(float w, float time) {
     if (fabs(w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
@@ -35,6 +35,7 @@ float sinw_over_w(float w, float time) {
     }
 }
 
+// function to compute 1 - cos(w delta T))
 float cosw(float w, float time) {
     return 1 - cos(w * time);
 }
@@ -134,19 +135,19 @@ int main(void) {
 
 #ifdef Sin_Taylor_Test
     // Example usage
-    float t = 1;
-    float omega_sin = 0.01; // Example value of wt
+    float t = 1; // test time
+    float omega_sin = 0.01; // test w
     float result = sinw_over_w(omega_sin, t);
     
-    float omega_sin_small = 0.000001; // Example value of wt
+    float omega_sin_small = 0.000001; // test w
     float res_small = sinw_over_w(omega_sin_small);
     
     float omega_cos = 0.01;
     float res_cos = cosw(omega_cos, t);
     
     float omega_cos_small = 0.000001;
-    float res_cos = cosw(omega_cos_small, t);
-    printf("Result: %f, %f\n", result, res_small, res_cos, res_cos_small);
+    float res_cos_small = cosw(omega_cos_small, t);
+    printf("Result: %f, %f, %f, %f\n", result, res_small, res_cos, res_cos_small);
 #endif
     return 0;
 }
