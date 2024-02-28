@@ -24,13 +24,23 @@ typedef struct {
 } Matrix3x3;
 
 // Function to compute the Taylor series approximation for sin(x?T)/x
-float sinx_over_x(float x) {
-    if (fabs(x) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
+float sinx_over_x(float w, float time) {
+    if (fabs(w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
         // Taylor series approximation
-        return 1.0 - (x * x) / 6.0 + (x * x * x * x) / 120.0;
+        return 1.0 - (pow((w*time), 2) / 6.0) + (pow((w*time), 4) / 120.0);
     } else {
         // Switch to sin function
-        return sin(x) / x;
+        return sin(w*time) / w;
+    }
+}
+
+float cosx_over_x_squared(float x) {
+    if (fabs(x) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
+        // Taylor series approximation
+        return (pow(x, 2) / 6.0) + (pow(x, 4) / 120.0);
+    } else {
+        // Switch to sin function
+        return 1 - cos(w*time);
     }
 }
 
@@ -54,7 +64,7 @@ float getEntry(const Matrix3x3 *matrix, int row, int col)
  * @return Equivalent value in degrees.
  */
 float convertRadToDeg(float rads)
-{
+{ 
     return rads * (180 / PI);
 }
 
