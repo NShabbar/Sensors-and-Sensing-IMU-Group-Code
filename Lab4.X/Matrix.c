@@ -4,43 +4,37 @@
  *
  * Created on February 27, 2024, 11:49 AM
  */
-
+#include <math.h>
 #include <stdio.h>
+
 #include "xc.h"
 #include "BOARD.h"
 #include "BNO055.h"
-#include <math.h>
+#include "Oled.h"
 
 // defines for code testing
-//#define Matrix_Test
-#define Sin_Taylor_Test
+#define Matrix_Test
+//#define Sin_Taylor_Test
 
 #define PI (acos(-1.0))
-// Struct definition for a 3x3 matrix
 #define EPSILON 0.0001 // Threshold for switching to sin function from Taylor Expansion
+
+//Struct definition for a 3x3 matrix
 
 typedef struct {
     float data[3][3];
 } Matrix3x3;
 
 // Function to compute the Taylor series approximation for sin(x?T)/x
-float sinx_over_x(float w, float time) {
+
+float sinx_over_x(float w, float time)
+{
     if (fabs(w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
         // Taylor series approximation
-        return 1.0 - (pow((w*time), 2) / 6.0) + (pow((w*time), 4) / 120.0);
+        return 1.0 - (pow((w * time), 2) / 6.0) + (pow((w * time), 4) / 120.0);
     } else {
         // Switch to sin function
-        return sin(w*time) / w;
-    }
-}
-
-float cosx_over_x_squared(float x) {
-    if (fabs(x) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
-        // Taylor series approximation
-        return (pow(x, 2) / 6.0) + (pow(x, 4) / 120.0);
-    } else {
-        // Switch to sin function
-        return 1 - cos(w*time);
+        return sin(w * time) / w;
     }
 }
 
@@ -64,7 +58,7 @@ float getEntry(const Matrix3x3 *matrix, int row, int col)
  * @return Equivalent value in degrees.
  */
 float convertRadToDeg(float rads)
-{ 
+{
     return rads * (180 / PI);
 }
 
@@ -110,8 +104,10 @@ float getPhi(Matrix3x3 *matrix)
 
 int main(void)
 {
-#ifdef Matrix_Test
     BOARD_Init();
+    OledInit();
+    char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
+#ifdef Matrix_Test
     Matrix3x3 foo = {
         {
             {0.8293, 0.5498, -0.0998},
@@ -125,7 +121,9 @@ int main(void)
     psi = convertRadToDeg(psi);
     float phi = getPhi(&foo);
     phi = convertRadToDeg(phi);
-    printf("Theta:%f  Psi:%f  Phi:%f\n", theta, psi, phi); // Expected values: Theta:5.727654  Psi:33.544071  Phi:-11.460480
+    sprintf(msg, "Theta:%f\nPsi  :%f\nPhi  :%f\n", theta, psi, phi); // Expected values: Theta:5.727654  Psi:33.544071  Phi:-11.460480
+    OledDrawString(msg);
+    OledUpdate();
     Matrix3x3 foo2 = {
         {
             {0.8293, -0.5498, 0.0998},
@@ -139,9 +137,11 @@ int main(void)
     psi = convertRadToDeg(psi);
     phi = getPhi(&foo2);
     phi = convertRadToDeg(phi);
-    printf("Theta:%f  Psi:%f  Phi:%f\n", theta, psi, phi); //Theta:-5.727654  Psi:-33.542721  Phi:-11.460480
+    sprintf(msg, "Theta:%f\nPsi  :%f\nPhi  :%f\n", theta, psi, phi); //Theta:-5.727654  Psi:-33.542721  Phi:-11.460480
+    OledDrawString(msg);
+    OledUpdate();
 #endif
-    
+
 #ifdef Sin_Taylor_Test
     // Example usage
     float omega_delta_t = 0.01; // Example value of ??t
