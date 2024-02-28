@@ -23,25 +23,33 @@
 #define Forward_Prop_test
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
 
-float sinw_over_w(float w, float time) {
-    if (fabs(w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
+float sinw_over_w(float mag_w, float time) {
+    if (fabs(mag_w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
         // Taylor series approximation
-        return time - ((pow(time, 3) * pow((w), 2)) / 6.0) + (((pow(time, 5) * pow((w), 4)) / 120.0));
+        return time - ((pow(time, 3) * pow((mag_w), 2)) / 6.0) + (((pow(time, 5) * pow((mag_w), 4)) / 120.0));
     } else {
         // Switch to sin function
-        return sin(w * time) / w;
+        return sin(mag_w * time) / mag_w;
     }
 }
 
 // function to compute 1 - cos(w delta T))
 
-float cosw(float w, float time) {
-    return 1 - cos(w * time);
+float cosw_over_w_squared(float mag_w, float time) {
+    if (fabs(mag_w) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
+        // Taylor series approximation
+        return (pow(time, 2)/2) - ((pow(time, 4) * pow(mag_w, 2)) / 24.0);
+    } else {
+    return 1 - (cos(mag_w * time)/(pow(mag_w, 2)));
+    }
 }
 
 // this function takes the w = [p, q, r] transpose, and finds the magnitutde.
 
-float w_mag(float p, float q, float r) {
+float w_mag(Matrix1x3 w) {
+    float p = w.data[0];
+    float q = w.data[1];
+    float r = w.data[2];
     float mag = sqrt(pow(p, 2) + pow(q, 2) + pow(r, 2));
     return mag;
 }
@@ -65,15 +73,35 @@ Matrix3x3 wx(Matrix1x3 w) {
 
 // this function performs forward integration of Rk+1 = Rk - [wx]Rk * dt
 Matrix3x3 RK_Forward_Integration(Matrix3x3 RK, Matrix1x3 w, float dt){
-    Matrix3x3 cross = wx(w);
-    Matrix3x3 RK_Wcross =dotProduct(&cross, &RK);
-    scalarMult(&RK_Wcross, dt);
+    Matrix3x3 cross = wx(w); // returns a 3x3 wx
+    Matrix3x3 RK_Wcross = dotProduct(&cross, &RK); //[wx]Rk
+    scalarMult(&RK_Wcross, dt); // [wx]Rk * dt
     Matrix3x3 RK_1 = subtraction(&RK,  &RK_Wcross);
     return RK_1;
 }
 
 // this function performs the matrix exponential form Rk+1 = e^(-[wx]dt) *Rk
-Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt);
+Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt){
+    Matrix3x3 I = {
+        {{1.0, 0.0, 0.0},
+         {0.0, 1.0, 0.0},
+         {0.0, 0.0, 1.0}}
+    };
+    float mag = w_mag(w); // gets magnitude
+    float cos_val = cosw_over_w_squared(mag, dt);
+    Matrix3x3 cross = wx(w); // returns a 3x3 wx
+    Matrix3x3 wx_wx = dotProduct(&cross, &cross); // squares wx matrix
+    scalarMult(&wx_wx, cos_val); // multiplies and updates the wx_wx by scalar val
+    
+    float sin_val = sinw_over_w(mag, dt);
+    scalarMult(&cross, sin_val);
+    
+    Matrix3x3 exponent_p1 = subtraction(&I, &cross); // first part of exponent calc.
+    Matrix3x3 exponent = subtraction(&exponent_p1, &wx_wx); // full exponent calc
+    
+    Matrix3x3 RK_1 = dotProduct(&exponent, &RK); // the final output
+    return RK_1;
+}
 
 #ifdef RK_test
 
@@ -122,7 +150,11 @@ int main(int argc, char** argv) {
     };
     
     Matrix3x3 result = RK_Forward_Integration(I, w_test, 2);
+    Matrix3x3 result2 = RK_Exp_Integration(I, w_test, 2);
+    printf("Forward Integration: \n");
     printMatrix(&result);
+    printf("Exponential Integration: \n");
+    printMatrix(&result2);
 #endif
     return (EXIT_SUCCESS);
 }

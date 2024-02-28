@@ -24,7 +24,7 @@ float cosw(float w, float time);
 float cosw(float w, float time);
 
 // this function takes the w = [p, q, r] transpose, and finds the magnitutde.
-float w_mag(float p, float q, float r);
+float w_mag(Matrix1x3 w);
 
 // this function performs forward integration of Rk+1 = Rk - [wx]Rk * dt
 Matrix3x3 RK_Forward_Integration(Matrix3x3 RK, Matrix1x3 w, float dt);
