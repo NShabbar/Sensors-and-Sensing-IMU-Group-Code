@@ -4,20 +4,22 @@
  *
  * Created on February 27, 2024, 11:49 AM
  */
-
+#include <math.h>
 #include <stdio.h>
+
 #include "xc.h"
 #include "BOARD.h"
 #include "BNO055.h"
-#include <math.h>
+#include "Oled.h"
 
 // defines for code testing
-//#define Matrix_Test
-#define Sin_Taylor_Test
+#define Matrix_Test
+//#define Sin_Taylor_Test
 
 #define PI (acos(-1.0))
-// Struct definition for a 3x3 matrix
 #define EPSILON 0.0001 // Threshold for switching to sin function from Taylor Expansion
+
+//Struct definition for a 3x3 matrix
 
 typedef struct {
     float data[3][3];
@@ -59,7 +61,8 @@ float getEntry(const Matrix3x3 *matrix, int row, int col) {
  * @param rads Value in radians.
  * @return Equivalent value in degrees.
  */
-float convertRadToDeg(float rads) {
+float convertRadToDeg(float rads)
+{
     return rads * (180 / PI);
 }
 
@@ -103,6 +106,9 @@ float getPhi(Matrix3x3 *matrix) {
 int main(void) {
 #ifdef Matrix_Test
     BOARD_Init();
+    OledInit();
+    char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
+#ifdef Matrix_Test
     Matrix3x3 foo = {
         {
             {0.8293, 0.5498, -0.0998},
@@ -116,7 +122,9 @@ int main(void) {
     psi = convertRadToDeg(psi);
     float phi = getPhi(&foo);
     phi = convertRadToDeg(phi);
-    printf("Theta:%f  Psi:%f  Phi:%f\n", theta, psi, phi); // Expected values: Theta:5.727654  Psi:33.544071  Phi:-11.460480
+    sprintf(msg, "Theta:%f\nPsi  :%f\nPhi  :%f\n", theta, psi, phi); // Expected values: Theta:5.727654  Psi:33.544071  Phi:-11.460480
+    OledDrawString(msg);
+    OledUpdate();
     Matrix3x3 foo2 = {
         {
             {0.8293, -0.5498, 0.0998},
@@ -130,7 +138,9 @@ int main(void) {
     psi = convertRadToDeg(psi);
     phi = getPhi(&foo2);
     phi = convertRadToDeg(phi);
-    printf("Theta:%f  Psi:%f  Phi:%f\n", theta, psi, phi); //Theta:-5.727654  Psi:-33.542721  Phi:-11.460480
+    sprintf(msg, "Theta:%f\nPsi  :%f\nPhi  :%f\n", theta, psi, phi); //Theta:-5.727654  Psi:-33.542721  Phi:-11.460480
+    OledDrawString(msg);
+    OledUpdate();
 #endif
 
 #ifdef Sin_Taylor_Test
