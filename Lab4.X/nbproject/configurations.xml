@@ -26,10 +26,10 @@
       <itemPath>I2C.c</itemPath>
       <itemPath>serial.c</itemPath>
       <itemPath>Matrix.c</itemPath>
-      <itemPath>../Common/Ascii.c</itemPath>
-      <itemPath>../Common/Oled.c</itemPath>
-      <itemPath>../Common/OledDriver.c</itemPath>
-      <itemPath>DCM.c</itemPath>
+      <itemPath>Ascii.c</itemPath>
+      <itemPath>Oled.c</itemPath>
+      <itemPath>OledDriver.c</itemPath>
+      <itemPath>RK.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
