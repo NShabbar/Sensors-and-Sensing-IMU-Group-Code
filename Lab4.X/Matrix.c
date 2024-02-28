@@ -11,12 +11,28 @@
 #include "BNO055.h"
 #include <math.h>
 
+// defines for code testing
+//#define Matrix_Test
+#define Sin_Taylor_Test
+
 #define PI (acos(-1.0))
 // Struct definition for a 3x3 matrix
+#define EPSILON 0.0001 // Threshold for switching to sin function from Taylor Expansion
 
 typedef struct {
     float data[3][3];
 } Matrix3x3;
+
+// Function to compute the Taylor series approximation for sin(x?T)/x
+float sinx_over_x(float x) {
+    if (fabs(x) < EPSILON) { // fabs takes the absolute val, 120 is the factorial of 5
+        // Taylor series approximation
+        return 1.0 - (x * x) / 6.0 + (x * x * x * x) / 120.0;
+    } else {
+        // Switch to sin function
+        return sin(x) / x;
+    }
+}
 
 // Function to get the value at a specific row and column in the matrix
 
@@ -84,6 +100,7 @@ float getPhi(Matrix3x3 *matrix)
 
 int main(void)
 {
+#ifdef Matrix_Test
     BOARD_Init();
     Matrix3x3 foo = {
         {
@@ -113,6 +130,14 @@ int main(void)
     phi = getPhi(&foo2);
     phi = convertRadToDeg(phi);
     printf("Theta:%f  Psi:%f  Phi:%f\n", theta, psi, phi); //Theta:-5.727654  Psi:-33.542721  Phi:-11.460480
+#endif
+    
+#ifdef Sin_Taylor_Test
+    // Example usage
+    float omega_delta_t = 0.01; // Example value of ??t
+    float result = sinx_over_x(omega_delta_t);
+    printf("Result: %f\n", result);
+#endif
     return 0;
 }
 
