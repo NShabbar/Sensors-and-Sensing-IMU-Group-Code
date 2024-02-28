@@ -3,7 +3,7 @@
  * Implements functions to get Euler angles from a DCM (3x3 Matrix) */
 
 #include "DCM.h"
-
+#include "Matrix.h"
 /**
  * Function to convert radians to degrees.
  * @param rads Value in radians.
