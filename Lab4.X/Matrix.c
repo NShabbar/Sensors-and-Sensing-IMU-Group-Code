@@ -129,7 +129,9 @@ void printMatrix(const Matrix3x3 *matrix) {
 
 #ifdef MATRIX_TEST
 #include <assert.h>
+#include "BOARD.h"
 int main() {
+    BOARD_Init();
     // Example matrices
     Matrix3x3 matrix1 = {
         {{1.0, 2.0, 3.0},
@@ -167,7 +169,7 @@ int main() {
     // Assert statements for subtractionResult can be added here
 
     printf("All tests passed!\n");
-
+    while(1);
     return 0;
 }
 #endif

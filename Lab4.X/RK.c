@@ -20,7 +20,7 @@
 #define RK_test
 //#define sin_cos_test
 //#define mag_test
-//#define Forward_Exp_test
+#define Forward_Exp_test
 //#define Drift_test
 #define Part_4_2
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
@@ -103,7 +103,7 @@ Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt) {
     scalarMult(&cross, sin_val);
 
     Matrix3x3 exponent_p1 = subtraction(&I, &cross); // first part of exponent calc.
-    Matrix3x3 exponent = subtraction(&exponent_p1, &wx_wx); // full exponent calc
+    Matrix3x3 exponent = addition(&exponent_p1, &wx_wx); // full exponent calc
 
     Matrix3x3 RK_1 = dotProduct(&exponent, &RK); // the final output
     return RK_1;
@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
     float gyr_z = BNO055_ReadGyroZ();
     
     printf("%f, %f, %f, %f, %f, %f, %f, %f, %f\n", accel_x, accel_y, accel_z, mag_x, mag_y, mag_z, gyr_x, gyr_y, gyr_z); 
-#endif
+
     return (EXIT_SUCCESS);
 }
 #endif
