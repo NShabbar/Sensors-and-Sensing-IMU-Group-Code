@@ -21,7 +21,8 @@
 //#define sin_cos_test
 //#define mag_test
 //#define Forward_Exp_test
-#define Drift_test
+//#define Drift_test
+#define Part_4_2
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
 
 float sinw_over_w(float mag_w, float time) {
@@ -174,25 +175,41 @@ int main(int argc, char** argv) {
     };
 
     Matrix1x3 w_test = {
-        {0.0, 0.0, 0.0}
+        {0.1, 0.2, 0.3}
     };
 
     Matrix1x3 w_test_2 = {
         {0.000001, 0.000001, 0.000001}
     };
-    Matrix3x3 result = RK_Forward_Integration(I, w_test, 2);
-    Matrix3x3 result2 = RK_Exp_Integration(I, w_test, 2);
+    Matrix3x3 result = RK_Forward_Integration(I, w_test, 0.01);
+    Matrix3x3 result2 = RK_Exp_Integration(I, w_test, 0.01);
     printf("Forward Integration Big W: \n");
     printMatrix(&result);
     printf("Exponential Integration Big W: \n");
     printMatrix(&result2);
-    
-    Matrix3x3 result3 = RK_Forward_Integration(I, w_test_2, 2);
-    Matrix3x3 result4 = RK_Exp_Integration(I, w_test_2, 2);
+
+    Matrix3x3 result3 = RK_Forward_Integration(I, w_test_2, 0.01);
+    Matrix3x3 result4 = RK_Exp_Integration(I, w_test_2, 0.01);
     printf("Forward Integration Small W: \n");
     printMatrix(&result3);
     printf("Exponential Integration Small W: \n");
     printMatrix(&result4);
+#endif
+
+#define Part_4_2
+    float accel_x = BNO055_ReadAccelX();
+    float accel_y = BNO055_ReadAccelY();
+    float accel_z = BNO055_ReadAccelZ();
+    
+    float mag_x = BNO055_ReadMagX();
+    float mag_y = BNO055_ReadMagY();
+    float mag_z = BNO055_ReadMagZ();
+    
+    float gyr_x = BNO055_ReadGyroX();
+    float gyr_y = BNO055_ReadGyroY();
+    float gyr_z = BNO055_ReadGyroZ();
+    
+    printf("%f, %f, %f, %f, %f, %f, %f, %f, %f\n", accel_x, accel_y, accel_z, mag_x, mag_y, mag_z, gyr_x, gyr_y, gyr_z); 
 #endif
     return (EXIT_SUCCESS);
 }

@@ -94,7 +94,7 @@ void printMatrix(const Matrix3x3 *matrix) {
     printf("Matrix:\n");
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            printf("%.2f\t", getEntry(matrix, i, j));
+            printf("%.6f  ", getEntry(matrix, i, j));
         }
         printf("\n");
     }
