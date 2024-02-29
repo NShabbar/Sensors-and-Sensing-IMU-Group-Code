@@ -54,10 +54,25 @@ Matrix3x3 dotProduct(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
  * Function to compute the subtraction of two matrices.
  * @param matrix1 Pointer to the first Matrix3x3 struct.
  * @param matrix2 Pointer to the second Matrix3x3 struct.
- * @return The resulting Matrix3x3 object representing the subtraction.
+ * @return The resulting Matrix3x3 object representing the subtraction of matrix1 - matrix2.
  */
 Matrix3x3 subtraction(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
 
+/**
+ * Function to compute the addition of two matrices.
+ * @param matrix1 Pointer to the first Matrix3x3 struct.
+ * @param matrix2 Pointer to the second Matrix3x3 struct.
+ * @return The resulting Matrix3x3 object representing the addition.
+ */
+Matrix3x3 addition(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2);
+
+
+/**
+ * Function to print a matrix3x3 struct
+ * @param matrix Pointer to the  Matrix3x3 struct.
+ * @return None
+ * @note Prints in matlab format
+ */
 void printMatrix(const Matrix3x3 *matrix);
 
 

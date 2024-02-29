@@ -88,7 +88,24 @@ Matrix3x3 subtraction(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2)
 
     return result;
 }
+/**
+ * Function to compute the addition of two matrices.
+ * @param matrix1 Pointer to the first Matrix3x3 struct.
+ * @param matrix2 Pointer to the second Matrix3x3 struct.
+ * @return The resulting Matrix3x3 object representing the addition.
+ */
+Matrix3x3 addition(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2){
+        Matrix3x3 result = {{{0}}}; // Initialize result matrix with zeros
 
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            float value = getEntry(matrix1, i, j) + getEntry(matrix2, i, j);
+            setEntry(&result, i, j, value);
+        }
+    }
+
+    return result;
+}
 // Function to print a matrix
 void printMatrix(const Matrix3x3 *matrix) {
     printf("Matrix:\n");
