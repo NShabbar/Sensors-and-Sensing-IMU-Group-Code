@@ -73,7 +73,7 @@ Matrix3x3 dotProduct(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2)
  * Function to compute the subtraction of two matrices.
  * @param matrix1 Pointer to the first Matrix3x3 struct.
  * @param matrix2 Pointer to the second Matrix3x3 struct.
- * @return The resulting Matrix3x3 object representing the subtraction.
+ * @return The resulting Matrix3x3 object representing the subtraction Matrix1 - Matrix2.
  */
 Matrix3x3 subtraction(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2)
 {
@@ -108,14 +108,23 @@ Matrix3x3 addition(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2){
 }
 // Function to print a matrix
 void printMatrix(const Matrix3x3 *matrix) {
-    printf("Matrix:\n");
+    printf("[");
     for (int i = 0; i < 3; i++) {
+        printf("[");
         for (int j = 0; j < 3; j++) {
-            printf("%.6f  ", getEntry(matrix, i, j));
+            printf("%.6f", getEntry(matrix, i, j));
+            if (j < 2) {
+                printf(",");
+            }
         }
-        printf("\n");
+        printf("]");
+        if (i < 2) {
+            printf(";\n");
+        }
     }
+    printf("]\n");
 }
+
 //#define MATRIX_TEST
 
 #ifdef MATRIX_TEST
