@@ -21,7 +21,7 @@
 //#define sin_cos_test
 //#define mag_test
 //#define Forward_Exp_test
-//#define Drift_test
+#define Drift_test
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
 
 float sinw_over_w(float mag_w, float time) {
@@ -165,50 +165,34 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef Drift_test
-    FILE *file_pointer;
-    //char buffer[100]; // Buffer to store read data
-    float r, p, q; // Variables to store data read from file
-
-    // Open the file in read mode
-    file_pointer = fopen("wGyro.txt", "r");
-
-    // Check if the file was opened successfully
-    if (file_pointer == NULL) {
-        printf("Error opening the file.\n");
-        return 1;
-    }
-    Matrix3x3 Rkarrayforward[7000];
-    Matrix3x3 Rkarrayexp[7000];
-    Matrix3x3 I={
+    Matrix3x3 I = {
         {
             {1.0, 0.0, 0.0},
             {0.0, 1.0, 0.0},
             {0.0, 0.0, 1.0}
         }
     };
-    Rkarrayforward[0] = I;
-    Rkarrayexp[0] = I;
-    // Read data from the file line by line
-    int ind=0;
-    while (fscanf(file_pointer, "%f, %f, %f", &p, &q, &r) == 3) {
-        
-        Matrix1x3 w = {
-            {p, q, r}
-        };
 
+    Matrix1x3 w_test = {
+        {0.0, 0.0, 0.0}
+    };
 
-
-        Rkarrayforward[ind+1] = RK_Forward_Integration(Rkarrayforward[ind], w, 0.01);
-        Rkarrayexp[ind+1] = RK_Exp_Integration(Rkarrayexp[ind], w, 0.01);
-        ind++;
-
-    }
-    printMatrix(&Rkarrayforward[6631]);
+    Matrix1x3 w_test_2 = {
+        {0.000001, 0.000001, 0.000001}
+    };
+    Matrix3x3 result = RK_Forward_Integration(I, w_test, 2);
+    Matrix3x3 result2 = RK_Exp_Integration(I, w_test, 2);
+    printf("Forward Integration Big W: \n");
+    printMatrix(&result);
+    printf("Exponential Integration Big W: \n");
+    printMatrix(&result2);
     
-    printMatrix(&Rkarrayexp[6631]);
-    
-    // Close the file
-    fclose(file_pointer);
+    Matrix3x3 result3 = RK_Forward_Integration(I, w_test_2, 2);
+    Matrix3x3 result4 = RK_Exp_Integration(I, w_test_2, 2);
+    printf("Forward Integration Small W: \n");
+    printMatrix(&result3);
+    printf("Exponential Integration Small W: \n");
+    printMatrix(&result4);
 #endif
     return (EXIT_SUCCESS);
 }
