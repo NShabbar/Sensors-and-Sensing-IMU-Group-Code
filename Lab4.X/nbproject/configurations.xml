@@ -14,6 +14,7 @@
       <itemPath>OledDriver.h</itemPath>
       <itemPath>RK.h</itemPath>
       <itemPath>DCM.h</itemPath>
+      <itemPath>../Common/timers.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -32,6 +33,8 @@
       <itemPath>OledDriver.c</itemPath>
       <itemPath>RK.c</itemPath>
       <itemPath>DCM.c</itemPath>
+      <itemPath>part4.c</itemPath>
+      <itemPath>../Common/timers.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -42,6 +45,7 @@
   <sourceRootList>
     <Elem>../../trkmille/Common</Elem>
     <Elem>.</Elem>
+    <Elem>../Common</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -53,7 +57,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>4.00</languageToolchainVersion>
+        <languageToolchainVersion>4.35</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
