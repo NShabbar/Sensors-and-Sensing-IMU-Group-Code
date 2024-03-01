@@ -94,6 +94,21 @@ int main(void)
     sprintf(msg, "Theta:%f\nPsi  :%f\nPhi  :%f\n", theta, psi, phi); //Theta:-5.727654  Psi:-33.542721  Phi:-11.460480
     OledDrawString(msg);
     OledUpdate();
+        Matrix3x3 foo3 = {
+        {
+            {-0.7371, 0.3286, -0.5905},
+            {0.3443, 0.9345, 0.0902},
+            {0.5815, -0.1368, -0.8020}
+        }
+    };
+        theta = getTheta(&foo3);   
+       // theta = convertRadToDeg(theta);
+        psi = getPsi(&foo3);
+       // psi = convertRadToDeg(psi);
+        phi = getPhi(&foo3);
+      //  phi = convertRadToDeg(phi);
+        printf("Pitch:%f  Yaw:%f  Roll:%f\n",theta,psi,phi);
+        while(1);
     return 0;
 }
 #endif

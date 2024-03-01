@@ -16,13 +16,6 @@
 #include "RK.h"
 #include "Matrix.h"
 
-// defines for testing
-#define RK_test
-//#define sin_cos_test
-//#define mag_test
-#define Forward_Exp_test
-//#define Drift_test
-#define Part_4_2
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
 
 float sinw_over_w(float mag_w, float time) {
