@@ -5,7 +5,7 @@ close all;
 
 % Step 1: Generate trajectory data without noise
 dT = 1/50; % Set timestep to match real data (e.g., 50Hz)
-noiseFlag = false; % No noise
+noiseFlag = true; % No noise
 
 [Acc, Mag, wGyro, Eul_true] = CreateTrajectoryData(dT, noiseFlag);
 
@@ -26,7 +26,7 @@ roll_true = deg2rad(Eul_true(:, 3));
 R_0 = [(cos(pitch_true(1))*cos(yaw_true(1))), cos(pitch_true(1))*sin(yaw_true(1)), -sin(pitch_true(1));
         (sin(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))-(cos(roll_true(1))*sin(yaw_true(1))), (sin(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) + (cos(roll_true(1))*cos(yaw_true(1))), sin(roll_true(1))*cos(pitch_true(1));
         (cos(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))+ (sin(roll_true(1))*sin(yaw_true(1))), (cos(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) - (sin(roll_true(1))*cos(yaw_true(1))), cos(roll_true(1))*cos(pitch_true(1))];
-
+disp(R_0);
 % Step 4: Integrate gyroscope output using forward integration and matrix exponential form
 pitches =[];
 yaws = [];
@@ -46,6 +46,9 @@ for i =1:length(pitch_true)
     else
         Rk_1 = IntegrateOpenLoop(Rk_1,foo,dT);
     end
+    if Rk_1(1,3) > 1
+        disp(Rk_1)
+    end
     pitch = -asin(Rk_1(1, 3));
     yaw = atan2(Rk_1(1,2),Rk_1(1,1));
     roll = atan2(Rk_1(2,3),Rk_1(3,3));
@@ -57,15 +60,21 @@ end
 figure(1);
 
 subplot(3, 1, 1);
-plot(rad2deg(yaw_true) - rad2deg(yaws));
-title('Yaw Error (Forward Integration)');
+plot(rad2deg(yaw_true),'bl');
+hold on;
+plot(rad2deg(yaws),'red');
+title('Yaw True and Measured (Exponential Integration)');
+legend('True Reading', 'Measured Value');
 
 subplot(3, 1, 2);
-plot((rad2deg(pitch_true) - rad2deg(pitches)));
-title('Pitch Error (Forward Integration)');
+plot(rad2deg(pitch_true),'bl'); ...
+hold on;...
+plot(rad2deg(pitches),'red');
+title(['Pitch True and Measured (Exponential Integration)']);
 
 subplot(3, 1, 3);
-plot((rad2deg(roll_true) - rad2deg(rolls)));
-title('Roll Error (Forward Integration)');
-
+plot(rad2deg(roll_true),'bl');
+hold on;
+plot(rad2deg(rolls),'red');
+title('Roll True and Measured (Exponential Integration)');
 
