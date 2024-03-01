@@ -13,37 +13,49 @@ noiseFlag = true; % we want noise
 [Acc, Mag, wGyro, Eul_true] = CreateTrajectoryData(dT, noiseFlag);
 
 % Define geographical coordinates of Santa Cruz, CA
-latitude = 36.9741;   % in degrees
-longitude = -122.0308; % in degrees
-altitude = 259.08;          % in meters (assuming sea level)
+% latitude = 36.9741;   % in degrees
+% longitude = -122.0308; % in degrees
+% altitude = 259.08;          % in meters (assuming sea level)
 gravity = 9.81;       % in meters per second squared
-nT = 23194.3/1000;           % nanoTeslas
+nT = 23194.3/1000;           % nanoTeslas from microTeslas
 
 % Inertial gravity vector points opposite to the NED position vector
 accelInertial = [gravity; 0; 0];
 
 % Define a unit vector pointing in the direction of magnetic north
-magInertial = [nT; 0; 0];
+magInertial = [0; 0; nT];
 
 % Step 2: Extract true Euler angles and bias
 yaw_true = deg2rad(Eul_true(:, 1));
 pitch_true = deg2rad(Eul_true(:, 2));
 roll_true = deg2rad(Eul_true(:, 3));
 
+yaw_100 = wGyro(1:50,1);
+pitch_100 = wGyro(1:50,2);
+roll_100 = wGyro(1:50,3);
+
+yaw_bias = mean(yaw_100);
+pitch_bias = mean(pitch_100);
+roll_bias = mean(roll_100);
 
 
 % Step 3: Initialize DCM from true Euler angles
-R_0 = [(cos(pitch_true(1))*cos(yaw_true(1))), cos(pitch_true(1))*sin(yaw_true(1)), -sin(pitch_true(1));
-        (sin(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))-(cos(roll_true(1))*sin(yaw_true(1))), (sin(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) + (cos(roll_true(1))*cos(yaw_true(1))), sin(roll_true(1))*cos(pitch_true(1));
-        (cos(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))+ (sin(roll_true(1))*sin(yaw_true(1))), (cos(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) - (sin(roll_true(1))*cos(yaw_true(1))), cos(roll_true(1))*cos(pitch_true(1))];
+% R_0 = [(cos(pitch_true(1))*cos(yaw_true(1))), cos(pitch_true(1))*sin(yaw_true(1)), -sin(pitch_true(1));
+%         (sin(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))-(cos(roll_true(1))*sin(yaw_true(1))), (sin(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) + (cos(roll_true(1))*cos(yaw_true(1))), sin(roll_true(1))*cos(pitch_true(1));
+%         (cos(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))+ (sin(roll_true(1))*sin(yaw_true(1))), (cos(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) - (sin(roll_true(1))*cos(yaw_true(1))), cos(roll_true(1))*cos(pitch_true(1))];
+
+R_0 = [1, 0, 0;
+        0, 1, 0;
+        0, 0, 1];
 
 % Step 4: Integrate gyroscope output using forward integration and matrix exponential form
 pitches =[];
 yaws = [];
 rolls = [];
-
+Bminus = [yaw_bias ; pitch_bias; roll_bias];
+% Bminus = [0; 0; 0];
 for i = 1:length(pitch_true)
-    Bminus = [0; 0; 0];
+    
     if i==1
         [Rk_1, g_bias] = IntegrateClosedLoop(R_0, Bminus, deg2rad(wGyro(i, :)./131), Mag(i,:), Acc(i,:), magInertial, accelInertial, dT);
     else
@@ -58,44 +70,35 @@ for i = 1:length(pitch_true)
     rolls = [rolls; rad2deg(roll)];
 end
 
-subplot(3, 2, 1);
-plot(rad2deg(yaw_true));
-title('Yaw Error (Exponential Integration)');
-subplot(3, 2, 2);
+PrettyPlotAttitudeData(dT,Acc,Mag,wGyro,Eul_true)
 
+subplot(3, 1, 1);
+plot(rad2deg(yaw_true), 'b');
+title('Yaw Error (Exponential Integration)');
+hold on;
+subplot(3, 1, 1);
+plot(yaws, 'r');
+title('Yaw Error (Exponential Integration)');
+
+subplot(3,1, 2);
 ylabel('Degrees of Difference');
-plot(rad2deg(pitch_true));
+plot(rad2deg(pitch_true), 'b');
+title('Pitch Error (Exponential Integration)');
+hold on;
+subplot(3, 1, 2);
+ylabel('Degrees of Difference');
+plot(pitches, 'r');
 title('Pitch Error (Exponential Integration)');
 
-subplot(3, 2, 3);
-plot(rad2deg(roll_true));
+
+subplot(3, 1, 3);
+plot(rad2deg(roll_true), 'b');
 xlabel('time (dt)');
 title('Roll Error (Exponential Integration)');
-
-subplot(3, 2, 4);
-plot(yaws);
-title('Yaw');
-subplot(3, 2, 5);
-
-ylabel('Degrees of Difference');
-plot(pitches);
-title('Pitch');
-
-subplot(3, 2, 6);
-plot(rolls);
+hold on;
+subplot(3, 1, 3);
+plot(rolls, 'r');
 xlabel('time (dt)');
-title('Roll');
-
-% subplot(4, 2, 1);
-% plot(Acc);
-% xlabel('time (dt)');
-% title('ACC');
-% 
-% 
-% 
-% subplot(4, 2, 2);
-% plot(Mag);
-% xlabel('time (dt)');
-% title('Mag');
+title('Roll Error (Exponential Integration)');
 
 
