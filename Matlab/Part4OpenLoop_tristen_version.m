@@ -23,23 +23,23 @@ pitch_true = deg2rad(Eul_true(:, 2));
 roll_true = deg2rad(Eul_true(:, 3));
 
 % Step 3: Initialize DCM from true Euler angles
-R_0 = [(cos(pitch_true(1))*cos(yaw_true(1))), cos(pitch_true(1))*sin(yaw_true(1)), -sin(pitch_true(1));
-        (sin(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))-(cos(roll_true(1))*sin(yaw_true(1))), (sin(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) + (cos(roll_true(1))*cos(yaw_true(1))), sin(roll_true(1))*cos(pitch_true(1));
-        (cos(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))+ (sin(roll_true(1))*sin(yaw_true(1))), (cos(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) - (sin(roll_true(1))*cos(yaw_true(1))), cos(roll_true(1))*cos(pitch_true(1))];
-disp(R_0);
+% R_0 = [(cos(pitch_true(1))*cos(yaw_true(1))), cos(pitch_true(1))*sin(yaw_true(1)), -sin(pitch_true(1));
+%         (sin(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))-(cos(roll_true(1))*sin(yaw_true(1))), (sin(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) + (cos(roll_true(1))*cos(yaw_true(1))), sin(roll_true(1))*cos(pitch_true(1));
+%         (cos(roll_true(1))*sin(pitch_true(1))*cos(yaw_true(1)))+ (sin(roll_true(1))*sin(yaw_true(1))), (cos(roll_true(1))*sin(pitch_true(1))*sin(yaw_true(1))) - (sin(roll_true(1))*cos(yaw_true(1))), cos(roll_true(1))*cos(pitch_true(1))];
+R_0 = eye(3);
 % Step 4: Integrate gyroscope output using forward integration and matrix exponential form
-pitches =[];
+pitches = [];
 yaws = [];
 rolls = [];
 for i =1:length(pitch_true)
     yaw_test = wGyro(i,1);
     pitch_test = wGyro(i,2);
     roll_test = wGyro(i,3);
-    if i >= 50
-        yaw_test = yaw_test - yaw_bias;
-        pitch_test = pitch_test - pitch_bias;
-        roll_test = roll_test -roll_bias;
-    end
+     % if i >= 50
+     %        yaw_test = yaw_test - yaw_bias;
+     %        pitch_test = pitch_test - pitch_bias;
+     %        roll_test = roll_test -roll_bias;
+     % end
     foo = [deg2rad(yaw_test/131),deg2rad(pitch_test/131),deg2rad(roll_test/131)];
     if i == 1
         Rk_1 = IntegrateOpenLoop(R_0,foo, dT);
@@ -47,7 +47,9 @@ for i =1:length(pitch_true)
         Rk_1 = IntegrateOpenLoop(Rk_1,foo,dT);
     end
     if Rk_1(1,3) > 1
-        disp(Rk_1)
+        Rk_1(1,3) = .9999;
+    elseif Rk_1(1,3) < -1
+        Rk_1(1,3) = -.9999;
     end
     pitch = -asin(Rk_1(1, 3));
     yaw = atan2(Rk_1(1,2),Rk_1(1,1));
@@ -63,18 +65,18 @@ subplot(3, 1, 1);
 plot(rad2deg(yaw_true),'bl');
 hold on;
 plot(rad2deg(yaws),'red');
-title('Yaw True and Measured (Exponential Integration)');
+title('Yaw True and Measured (Forward Integration)');
 legend('True Reading', 'Measured Value');
 
 subplot(3, 1, 2);
 plot(rad2deg(pitch_true),'bl'); ...
 hold on;...
 plot(rad2deg(pitches),'red');
-title(['Pitch True and Measured (Exponential Integration)']);
+title(['Pitch True and Measured (Forward Integration)']);
 
 subplot(3, 1, 3);
 plot(rad2deg(roll_true),'bl');
 hold on;
 plot(rad2deg(rolls),'red');
-title('Roll True and Measured (Exponential Integration)');
+title('Roll True and Measured (Forward Integration)');
 
