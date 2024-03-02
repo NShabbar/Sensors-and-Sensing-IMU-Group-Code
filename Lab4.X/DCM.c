@@ -4,6 +4,8 @@
 
 #include "DCM.h"
 #include "Matrix.h"
+
+//#define DCM_TEST
 /**
  * Function to convert radians to degrees.
  * @param rads Value in radians.
@@ -13,6 +15,12 @@ float convertRadToDeg(float rads)
 {
     return rads * (180 / PI);
 }
+
+float convertDegToRad(float degs)
+{
+    return degs * (PI / 180);
+}
+
 
 /**
  * Function to calculate the theta angle in radians.
@@ -56,6 +64,7 @@ float getPhi(DCM *matrix)
 
 //#define DCM_TEST
 #ifdef DCM_TEST
+/*
 int main(void)
 {
     #include "Oled.h"
@@ -110,5 +119,5 @@ int main(void)
         printf("Pitch:%f  Yaw:%f  Roll:%f\n",theta,psi,phi);
         while(1);
     return 0;
-}
+}*/
 #endif
