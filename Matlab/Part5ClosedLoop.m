@@ -53,7 +53,7 @@ pitches =[];
 yaws = [];
 rolls = [];
 Bminus = [yaw_bias ; pitch_bias; roll_bias];
-% Bminus = [0; 0; 0];
+%Bminus = [0; 0; 0];
 for i = 1:length(pitch_true)
     
     if i==1
