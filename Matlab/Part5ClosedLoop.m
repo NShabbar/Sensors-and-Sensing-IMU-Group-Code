@@ -23,7 +23,7 @@ nT = 23194.3/1000;           % nanoTeslas from microTeslas
 accelInertial = [0; 0; gravity];
 
 % Define a unit vector pointing in the direction of magnetic north
-magInertial = [nT; 0; 0];
+magInertial = [22770;5329;41510.2]/1000;
 
 % Step 2: Extract true Euler angles and bias
 yaw_true = deg2rad(Eul_true(:, 1));

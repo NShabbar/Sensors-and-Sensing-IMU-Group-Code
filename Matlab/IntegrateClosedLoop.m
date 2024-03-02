@@ -26,7 +26,7 @@ function [Rplus, Bplus] = IntegrateClosedLoop(Rminus, Bminus, gyros, mags, accel
 Kp_a=25;
 Ki_a=Kp_a/10;
 
-Kp_m=5;
+Kp_m=10;
 Ki_m=Kp_m/10;
 
 accels = accels/norm(accels);                       % set mags and accels to unit vectors
