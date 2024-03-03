@@ -55,6 +55,8 @@ extern "C" {
      * @return Equivalent value in degrees.
      */
     float convertRadToDeg(float rads);
+    
+    float convertDegToRad(float degs);
 
     /**
      * Function to calculate the theta angle in radians.

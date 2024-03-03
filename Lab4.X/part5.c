@@ -1,9 +1,10 @@
 /* 
- * File:   part4.c
- * Author: hiaad
+ * File:   part5.c
+ * Author: Nadia
  *
- * Created on March 1, 2024, 1:10 PM
+ * Created on March 1, 2024, 5:20 PM
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "BOARD.h"
@@ -17,8 +18,6 @@
 /*
  * 
  */
-//#define PART4
-
 #define dt 0.02
 
 float gyroX;
@@ -48,8 +47,7 @@ Matrix3x3 Rk_1;
 float bigdata[50][3];
 
 int maincount=0;
-#ifdef PART4
-/*
+#ifdef PART5
 int main(int argc, char** argv) {
     BOARD_Init();
     BNO055_Init();
@@ -63,7 +61,7 @@ int main(int argc, char** argv) {
     float y_hat = (gyroY)/131;
     float z_hat = (gyroZ)/131;
     
-    Matrix1x3 omega={{x_hat,y_hat,z_hat}};
+    Matrix3x1 omega={{{x_hat},{y_hat},{z_hat}}};
     Rk_1=RK_Exp_Integration(R_0, omega, dt);
     while(1){
         
@@ -95,20 +93,20 @@ int main(int argc, char** argv) {
             x_hat = convertDegToRad(gyroX-Xbias)/131;
             y_hat = convertDegToRad(gyroY-Ybias)/131;
             z_hat = convertDegToRad(gyroZ-Zbias)/131;
-            Matrix1x3 omega={{x_hat,y_hat,z_hat}};
+            Matrix3x1 omega={{{x_hat},{y_hat},{z_hat}}};
             Rk_1=RK_Exp_Integration(Rk_1, omega, dt);
             
             psi=getPsi(&Rk_1);
             phi=getPhi(&Rk_1);
             theta=getTheta(&Rk_1);
-                printf("%d: %f %f %f\n",maincount,convertRadToDeg(psi), convertRadToDeg(phi), convertRadToDeg(theta));
-        }
+                //printf("%d: %f %f %f\n",maincount,convertRadToDeg(psi), convertRadToDeg(phi), convertRadToDeg(theta));
+            
+            }
             maincount++;
         }
         
     }
     return (EXIT_SUCCESS);
 }
- * */
 #endif
 

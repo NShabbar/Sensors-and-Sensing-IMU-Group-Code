@@ -15,7 +15,16 @@
 #include "Oled.h"
 #include "RK.h"
 #include "Matrix.h"
+#include "DCM.h"
+#include "timers.h"
 
+
+#define RK_test
+//#define sin_cos_test
+//#define mag_test
+//#define Forward_Exp_test
+//#define Drift_test
+#define Part5
 // Function to compute the Taylor series approximation for sin(w deltaT)/w
 
 float sinw_over_w(float mag_w, float time) {
@@ -41,19 +50,19 @@ float cosw_over_w_squared(float mag_w, float time) {
 
 // this function takes the w = [p, q, r] transpose, and finds the magnitutde.
 
-float w_mag(Matrix1x3 w) {
-    float p = w.data[0];
-    float q = w.data[1];
-    float r = w.data[2];
+float w_mag(Matrix3x1 w) {
+    float p = w.data[0][0];
+    float q = w.data[1][0];
+    float r = w.data[2][0];
     float mag = sqrt(pow(p, 2) + pow(q, 2) + pow(r, 2));
     return mag;
 }
 
-Matrix3x3 wx(Matrix1x3 w) {
+Matrix3x3 wx(Matrix3x1 w) {
     Matrix3x3 temp;
-    float p = w.data[0];
-    float q = w.data[1];
-    float r = w.data[2];
+    float p = w.data[0][0];
+    float q = w.data[1][0];
+    float r = w.data[2][0];
     temp.data[0][0] = 0;
     temp.data[0][1] = -r;
     temp.data[0][2] = q;
@@ -68,17 +77,17 @@ Matrix3x3 wx(Matrix1x3 w) {
 
 // this function performs forward integration of Rk+1 = Rk - [wx]Rk * dt
 
-Matrix3x3 RK_Forward_Integration(Matrix3x3 RK, Matrix1x3 w, float dt) {
+Matrix3x3 RK_Forward_Integration(Matrix3x3 RK, Matrix3x1 w, float dt) {
     Matrix3x3 cross = wx(w); // returns a 3x3 wx
     Matrix3x3 RK_Wcross = dotProduct(&cross, &RK); //[wx]Rk
     scalarMult(&RK_Wcross, dt); // [wx]Rk * dt
-    Matrix3x3 RK_1 = subtraction(&RK, &RK_Wcross);
+    Matrix3x3 RK_1 = subtraction3x3(&RK, &RK_Wcross);
     return RK_1;
 }
 
 // this function performs the matrix exponential form Rk+1 = e^(-[wx]dt) *Rk
 
-Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt) {
+Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix3x1 w, float dt) {
     Matrix3x3 I = {
         {
             {1.0, 0.0, 0.0},
@@ -95,20 +104,66 @@ Matrix3x3 RK_Exp_Integration(Matrix3x3 RK, Matrix1x3 w, float dt) {
     float sin_val = sinw_over_w(mag, dt);
     scalarMult(&cross, sin_val);
 
-    Matrix3x3 exponent_p1 = subtraction(&I, &cross); // first part of exponent calc.
+    Matrix3x3 exponent_p1 = subtraction3x3(&I, &cross); // first part of exponent calc.
     Matrix3x3 exponent = addition(&exponent_p1, &wx_wx); // full exponent calc
 
     Matrix3x3 RK_1 = dotProduct(&exponent, &RK); // the final output
     return RK_1;
 }
 
-#ifdef RK_test
+Matrix3x3 RK_Exp_Closed_Loop(Matrix3x3 RK, Matrix3x1 bias, Matrix3x1 gyro, Matrix3x1 mags, Matrix3x1 accels, Matrix3x1 mag_inertial, Matrix3x1 accel_inertial, float dt) {
+
+
+    float accels_magnitude = w_mag(accels); // magnitude of accels
+    float mags_magnitude = w_mag(mags); // magnitude of the mags
+
+    scalarMult3x1(&accels, (1 / accels_magnitude)); // normalizes the accels
+    scalarMult3x1(&mags, (1 / mags_magnitude)); // normalizes the mags
+
+    float accels_inertial_magnitude = w_mag(accel_inertial); // magnitude of accel_inertial
+    float mags_inertial_magnitude = w_mag(mag_inertial); // magnitude of the mag_inertial
+
+    scalarMult3x1(&accel_inertial, (1 / accels_inertial_magnitude)); // normalizes the accel inertial
+    scalarMult3x1(&mag_inertial, (1 / mags_inertial_magnitude)); // normalizes the mags inertial
+
+    Matrix3x1 gyroInputWithBias = subtraction3x1(&gyro, &bias);
+    Matrix3x1 wmeas_a_right = dotProduct3x1(&RK, &accel_inertial);
+    Matrix3x1 wmeas_m_right = dotProduct3x1(&RK, &mag_inertial);
+    Matrix3x3 wmeas_a_left = wx(accels);
+    Matrix3x3 wmeas_m_left = wx(mags);
+    Matrix3x1 wmeas_a = dotProduct3x1(&wmeas_a_left, &wmeas_a_right);
+    Matrix3x1 wmeas_m = dotProduct3x1(&wmeas_m_left, &wmeas_m_right);
+
+    Matrix3x1 wmeasxKpa = wmeas_a;
+    Matrix3x1 wmeasxKpm = wmeas_m;
+
+    scalarMult3x1(&wmeasxKpa, Kp_a);
+    scalarMult3x1(&wmeasxKpm, Kp_m);
+
+    Matrix3x1 gyroInputWithFeedback_right = addition3x1(&wmeasxKpa, &wmeasxKpm);
+
+    Matrix3x1 gyroInputWithFeedback = addition3x1(&gyroInputWithBias, &gyroInputWithFeedback_right);
+    scalarMult3x1(&wmeas_a, -1 * Ki_a);
+    scalarMult3x1(&wmeas_m, -1 * Ki_m);
+    Matrix3x1 bdot = addition3x1(&wmeas_a, &wmeas_m);
+
+    Matrix3x3 Rplus_left = RK_Exp_Integration(RK, gyroInputWithFeedback, dt);
+    Matrix3x3 RK_1 = Rplus_left;
+
+
+    return RK_1;
+}
+//#ifdef RK_test
 
 int main(int argc, char** argv) {
     // Example usage
     BOARD_Init();
-    OledInit();
+    TIMERS_Init();
+    BNO055_Init();
+    printf("START\n");
+    //OledInit();
     //char msg[OLED_DRIVER_BUFFER_SIZE]; //Variable to sprintf messages to the oled
+    /*
 #ifdef sin_cos_test
     float t = 1; // test time
     float omega_sin = 0.01; // test w
@@ -146,8 +201,12 @@ int main(int argc, char** argv) {
         }
     };
 
-    Matrix1x3 w_test = {
-        {1.0, 2.0, 3.0}
+    Matrix3x1 w_test = {
+        {
+            {1.0},
+            {2.0},
+            {3.0}
+        }
     };
 
     Matrix3x3 result = RK_Forward_Integration(I, w_test, 2);
@@ -167,12 +226,20 @@ int main(int argc, char** argv) {
         }
     };
 
-    Matrix1x3 w_test = {
-        {0.1, 0.2, 0.3}
+    Matrix3x1 w_test = {
+        {
+            {1.0},
+            {2.0},
+            {3.0}
+        }
     };
 
-    Matrix1x3 w_test_2 = {
-        {0.000001, 0.000001, 0.000001}
+    Matrix3x1 w_test_2 = {
+        {
+            {0.000001},
+            {0.000001},
+            {0.000001}
+        }
     };
     Matrix3x3 result = RK_Forward_Integration(I, w_test, 0.01);
     Matrix3x3 result2 = RK_Exp_Integration(I, w_test, 0.01);
@@ -189,22 +256,97 @@ int main(int argc, char** argv) {
     printMatrix(&result4);
 #endif
 
-#define Part_4_2
-    float accel_x = BNO055_ReadAccelX();
-    float accel_y = BNO055_ReadAccelY();
-    float accel_z = BNO055_ReadAccelZ();
-    
-    float mag_x = BNO055_ReadMagX();
-    float mag_y = BNO055_ReadMagY();
-    float mag_z = BNO055_ReadMagZ();
-    
-    float gyr_x = BNO055_ReadGyroX();
-    float gyr_y = BNO055_ReadGyroY();
-    float gyr_z = BNO055_ReadGyroZ();
-    
-    printf("%f, %f, %f, %f, %f, %f, %f, %f, %f\n", accel_x, accel_y, accel_z, mag_x, mag_y, mag_z, gyr_x, gyr_y, gyr_z); 
+#ifdef Part5
+     * */
+    Matrix3x3 I = {
+        {
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}
+        }
+    };
 
+    Matrix3x1 bias = {
+        {
+            {0.0},
+            {0.0},
+            {0.0}
+        }
+    };
+    Matrix3x3 Rk_1 = I;
+    float theta; //pitch
+    float phi; //roll
+    float psi; //yaw
+    int prevtime = 0;
+    int currtime = 0;
+    printf("HERE1\n");
+    while (1) {
+        currtime = TIMERS_GetMilliSeconds();
+        if (currtime - prevtime >= 20) {
+            
+            prevtime = currtime;
+            
+            float accel_x = BNO055_ReadAccelX();
+            float accel_y = BNO055_ReadAccelY();
+            float accel_z = BNO055_ReadAccelZ();
+            
+            float mag_x = BNO055_ReadMagX();
+            float mag_y = BNO055_ReadMagY();
+            float mag_z = BNO055_ReadMagZ();
+
+            float gyr_x = BNO055_ReadGyroX();
+            float gyr_y = BNO055_ReadGyroY();
+            float gyr_z = BNO055_ReadGyroZ();
+            
+            Matrix3x1 gyro = {
+                {
+                    {convertDegToRad(gyr_x)/131.0},
+                    {convertDegToRad(gyr_y)/131.0},
+                    {convertDegToRad(gyr_z)/131.0}
+                }
+            };
+            Matrix3x1 mags = {
+                {
+                    {mag_x},
+                    {mag_y},
+                    {mag_z}
+                }
+            };
+
+            Matrix3x1 accels = {
+                {
+                    {accel_x},
+                    {accel_y},
+                    {accel_z}
+                }
+            };
+
+            Matrix3x1 mag_inertial = {
+                {
+                    {22770.0 / 1000.0},
+                    {5329.0 / 1000.0},
+                    {41510.2 / 1000.0}
+                }
+            };
+
+            Matrix3x1 accel_inertial = {
+                {
+                    {0.0},
+                    {0.0},
+                    {9.81}
+                }
+            };
+
+            Matrix3x3 Rk_1 = RK_Exp_Closed_Loop(I, bias, gyro, mags, accels, mag_inertial, accel_inertial, 0.02);
+            psi = getPsi(&Rk_1);
+            phi = getPhi(&Rk_1);
+            theta = getTheta(&Rk_1);
+            printf("%f %f %f\n", convertRadToDeg(psi), convertRadToDeg(phi), convertRadToDeg(theta));
+            //        printMatrix(&Test);
+        }
+    }
+    //#endif
     return (EXIT_SUCCESS);
 }
-#endif
+//#endif
 
