@@ -83,12 +83,16 @@ void scalarMult(Matrix3x3 *matrix, float scalar) {
     }
 }
 
-void scalarMult3x1(Matrix3x1 *matrix, float scalar) {
+Matrix3x1 scalarMult3x1(Matrix3x1 *matrix, float scalar) {
+    Matrix3x1 result = {{
+        {0},{0},{0}}};
     for (int i = 0; i < 1; i++) {
         for (int j = 0; j < 3; j++) {
-            setEntry3x1(matrix, j, getEntry3x1(matrix, j) * scalar);
+            setEntry3x1(&result, j, getEntry3x1(matrix, j) * scalar);
         }
     }
+    return result;
+   
 }
 
 void scalarMult1x3(Matrix1x3 *matrix, float scalar) {
@@ -125,16 +129,16 @@ Matrix3x3 dotProduct(const Matrix3x3 *matrix1, const Matrix3x3 *matrix2) {
 Matrix3x1 dotProduct3x1(const Matrix3x3 *matrix1, const Matrix3x1 *matrix2) {
     Matrix3x1 result = {{
         
-            {0}}}; // Initialize result matrix with zeros
+        {0},{0},{0}}}; // Initialize result matrix with zeros
 
     for (int i = 0; i < 3; i++) {
+        float sum = 0.0;
         for (int j = 0; j < 3; j++) {
-            float sum = 0.0;
-            for (int k = 0; k < 3; k++) {
-                sum += getEntry(matrix1, i, k) * getEntry3x1(matrix2, k);
-            }
-            setEntry3x1(&result, j, sum);
+                sum += getEntry(matrix1, i, j) * getEntry3x1(matrix2, j);
+                //printf("%d %d: %f\n", i, j, getEntry(matrix1, i, j) * getEntry3x1(matrix2, j));
         }
+        
+        setEntry3x1(&result, i, sum);
     }
 
     return result;
@@ -217,6 +221,24 @@ void printMatrix(const Matrix3x3 *matrix) {
         printf("[");
         for (int j = 0; j < 3; j++) {
             printf("%.6f", getEntry(matrix, i, j));
+            if (j < 2) {
+                printf(",");
+            }
+        }
+        printf("]");
+        if (i < 2) {
+            printf(";\n");
+        }
+    }
+    printf("]\n");
+}
+
+void printMatrix3x1(const Matrix3x1 *matrix) {
+    printf("[");
+    for (int i = 0; i < 3; i++) {
+        printf("[");
+        for (int j = 0; j < 1; j++) {
+            printf("%.6f", getEntry3x1(matrix, i));
             if (j < 2) {
                 printf(",");
             }

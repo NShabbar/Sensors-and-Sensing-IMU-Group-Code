@@ -61,7 +61,7 @@ void scalarMult(Matrix3x3 *matrix, float scalar);
 
 void scalarMult1x3(Matrix1x3 *matrix, float scalar);
 
-void scalarMult3x1(Matrix3x1 *matrix, float scalar);
+Matrix3x1 scalarMult3x1(Matrix3x1 *matrix, float scalar);
 
 /**
  * Function to compute the dot product of two matrices.
@@ -100,6 +100,7 @@ Matrix3x1 addition3x1(const Matrix3x1 *matrix1, const Matrix3x1 *matrix2);
  * @note Prints in matlab format
  */
 void printMatrix(const Matrix3x3 *matrix);
+void printMatrix3x1(const Matrix3x1 *matrix);
 
 
 

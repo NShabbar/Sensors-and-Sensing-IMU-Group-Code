@@ -1,0 +1,1 @@
+ $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DDCM_TEST -I"../Common" -I"../../trkmille/Common" -I"." -Wall   -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  C:\Users\hiaad\OneDrive\Desktop\ECE167lab4\smartbin_lab4\Lab4.X\BNO055.c

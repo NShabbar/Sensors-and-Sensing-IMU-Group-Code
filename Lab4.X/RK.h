@@ -11,8 +11,8 @@
 #include "Matrix.h"
 
 #define EPSILON 0.0001 // Threshold for switching to sin function from Taylor Expansion
-#define Kp_a 25
-#define Kp_m 5
+#define Kp_a 10
+#define Kp_m 10
 #define Ki_a Kp_a/10
 #define Ki_m Kp_m/10
 
