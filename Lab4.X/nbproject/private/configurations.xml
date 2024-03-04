@@ -4,8 +4,16 @@
   <defaultConf>0</defaultConf>
   <confs>
     <conf name="default" type="2">
+<<<<<<< HEAD
+      <platformToolSN></platformToolSN>
+=======
       <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR161872123:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
+<<<<<<< HEAD
       <languageToolchainDir>C:\Program Files\Microchip\xc32\v4.35\bin</languageToolchainDir>
+=======
+>>>>>>> 1d5ba1168ea8866797a4b70b8a26d242ef101780
+      <languageToolchainDir>C:\Program Files\Microchip\xc32\v4.00\bin</languageToolchainDir>
+>>>>>>> 1e4375440c80ff97decf97064969dc7e7b4c5322
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
